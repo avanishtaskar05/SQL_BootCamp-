@@ -1,1 +1,1 @@
-
+--What are the datatypes used for the database?--
