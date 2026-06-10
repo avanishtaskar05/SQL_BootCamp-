@@ -1,7 +1,7 @@
 --What is DBMS?--
 DBMS (Database Management System) is software that helps users create, store, organize, retrieve, and manage data in a database efficiently.
 
---Difference between DBMS and RDBS?--
+--Difference between DBMS and RDBMS?--
  Feature             | DBMS                                                 | RDBMS                                                    
  ------------------- | ---------------------------------------------------- | --------------------------------------------------------
  **Full Form**       | Database Management System                           | Relational Database Management System                    
