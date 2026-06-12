@@ -1,214 +1,190 @@
--- Create Database Design
-CREATE DATABASE FinCoreDW;
+CREATE DATABASE fincoredb;
 
--- Use Database : FincodeDW
-USE FinCoreDW;
+USE fincoredb;
 
--- Prepare Entities for Banking Application
-CREATE TABLE Dim_Customer (
-    Customer_Key INT AUTO_INCREMENT PRIMARY KEY,
-    Customer_ID VARCHAR(20) NOT NULL UNIQUE,
-    First_Name VARCHAR(50),
-    Last_Name VARCHAR(50),
-    Gender CHAR(1),
-    Date_of_Birth DATE,
-    Mobile_Number VARCHAR(15),
-    Email VARCHAR(100),
-    City VARCHAR(50),
-    State VARCHAR(50),
-    Country VARCHAR(50),
-    Customer_Type VARCHAR(30),
-    KYC_Status VARCHAR(20)
+CREATE TABLE dim_customers (
+    customer_key INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id VARCHAR(20) NOT NULL UNIQUE,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    gender enum("Male","Female","Other") default "Male",
+    date_of_birth DATE,
+    mobile_number VARCHAR(15),
+    email VARCHAR(30),
+    city VARCHAR(30),
+    state VARCHAR(30),
+    country VARCHAR(30),
+    customer_type VARCHAR(30),
+    KYC_Status VARCHAR(14)
 );
 
-CREATE TABLE Dim_Account (
-    Account_Key INT AUTO_INCREMENT PRIMARY KEY,
-    Account_Number VARCHAR(20) NOT NULL UNIQUE,
-    Account_Type VARCHAR(30),
-    Account_Status VARCHAR(20),
-    Currency VARCHAR(10),
-    Opening_Date DATE,
-    Minimum_Balance DECIMAL(15 , 2 ),
-    Nominee_Available BOOLEAN
+CREATE TABLE dim_accounts (
+    account_key INT AUTO_INCREMENT PRIMARY KEY,
+    account_number VARCHAR(20) NOT NULL UNIQUE,
+    account_type VARCHAR(30),
+    account_status VARCHAR(20),
+    currency VARCHAR(10),
+    opening_date DATE,
+    minimum_balance DECIMAL(15,2),
+    nominee_available BOOLEAN
 );
 
-CREATE TABLE Dim_Branch (
-    Branch_Key INT AUTO_INCREMENT PRIMARY KEY,
-    Branch_Code VARCHAR(20) UNIQUE,
-    Branch_Name VARCHAR(100),
-    City VARCHAR(100),
-    State VARCHAR(100),
-    Region VARCHAR(100),
-    IFSC_Code VARCHAR(20)
+CREATE TABLE dim_branches (
+    branch_key INT AUTO_INCREMENT PRIMARY KEY,
+    branch_code VARCHAR(20) UNIQUE,
+    branch_name VARCHAR(40),
+    city VARCHAR(40),
+    state VARCHAR(30),
+    region VARCHAR(30),
+    ifsc_code VARCHAR(11)
 );
 
-CREATE TABLE Dim_Date (
-    Date_Key INT PRIMARY KEY,
-    Full_Date DATE,
-    Day_Number INT,
-    Month_Number INT,
-    Month_Name VARCHAR(20),
-    Quarter_Number INT,
-    Year_Number INT,
-    Week_Number INT,
-    Is_Weekend CHAR(1)
+CREATE TABLE dim_dates (
+    date_key INT PRIMARY KEY unique,
+    full_date DATE,
+    account_opening_date date
 );
 
-CREATE TABLE Dim_Employee (
-    Employee_Key INT AUTO_INCREMENT PRIMARY KEY,
-    Employee_ID VARCHAR(20) UNIQUE,
-    Employee_Name VARCHAR(100),
-    Designation VARCHAR(100),
-    Department VARCHAR(100),
-    Branch_Name VARCHAR(100),
-    Hire_Date DATE
+CREATE TABLE dim_employees (
+    employee_key INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id VARCHAR(20) UNIQUE,
+    employee_name VARCHAR(20),
+    designation VARCHAR(30),
+    department VARCHAR(40),
+    branch_name VARCHAR(40),
+    hire_date DATE
 );
 
-CREATE TABLE Dim_Transaction_Type (
-    Transaction_Type_Key INT AUTO_INCREMENT PRIMARY KEY,
-    Transaction_Code VARCHAR(20) UNIQUE,
-    Transaction_Name VARCHAR(50),
-    Transaction_Category VARCHAR(50)
+CREATE TABLE dim_transaction_types (
+    transaction_type_key INT AUTO_INCREMENT PRIMARY KEY,
+    transaction_code VARCHAR(20) UNIQUE,
+    transaction_name VARCHAR(50),
+    transaction_category VARCHAR(50)
 );
 
-CREATE TABLE Dim_Channel (
-    Channel_Key INT AUTO_INCREMENT PRIMARY KEY,
-    Channel_Code VARCHAR(20) UNIQUE,
-    Channel_Name VARCHAR(50),
-    Channel_Type VARCHAR(50)
+CREATE TABLE dim_channels (
+    channel_key INT AUTO_INCREMENT PRIMARY KEY,
+    channel_code VARCHAR(20) UNIQUE,
+    channel_name VARCHAR(40),
+    channel_type VARCHAR(40)
 );
 
-CREATE TABLE Dim_Loan_Product (
-    Loan_Product_Key INT AUTO_INCREMENT PRIMARY KEY,
-    Loan_Product_Code VARCHAR(20) UNIQUE,
-    Loan_Product_Name VARCHAR(100),
-    Loan_Category VARCHAR(50),
-    Maximum_Tenure INT
+CREATE TABLE dim_loan_products (
+    loan_product_Key INT AUTO_INCREMENT PRIMARY KEY,
+    loan_product_Code VARCHAR(20) UNIQUE,
+    loan_product_Name VARCHAR(100),
+    loan_category VARCHAR(50),
+    maximum_tenure INT
 );
 
-CREATE TABLE Dim_Card (
-    Card_Key INT AUTO_INCREMENT PRIMARY KEY,
-    Card_Number VARCHAR(25) UNIQUE,
-    Card_Type VARCHAR(30),
-    Card_Network VARCHAR(30),
-    Card_Category VARCHAR(30),
-    Issue_Date DATE,
-    Expiry_Date DATE,
-    Card_Status VARCHAR(20)
+CREATE TABLE dim_cards (
+    card_key INT AUTO_INCREMENT PRIMARY KEY,
+    card_number VARCHAR(25) UNIQUE,
+    card_type VARCHAR(30),
+    card_network VARCHAR(30),
+    card_category VARCHAR(30),
+    issue_date DATE,
+    expiry_date DATE,
+    card_status VARCHAR(20)
 );
 
-CREATE TABLE Fact_Transaction (
-    Transaction_Fact_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    Customer_Key INT NOT NULL,
-    Account_Key INT NOT NULL,
-    Branch_Key INT NOT NULL,
-    Date_Key INT NOT NULL,
-    Employee_Key INT,
-    Transaction_Type_Key INT NOT NULL,
-    Channel_Key INT NOT NULL,
-    Transaction_Amount DECIMAL(18 , 2 ) NOT NULL,
-    Transaction_Fee DECIMAL(18 , 2 ) DEFAULT 0,
-    Balance_After_Transaction DECIMAL(18 , 2 ),
-    Transaction_Count INT DEFAULT 1,
-    FOREIGN KEY (Customer_Key)
-        REFERENCES Dim_Customer (Customer_Key),
-    FOREIGN KEY (Account_Key)
-        REFERENCES Dim_Account (Account_Key),
-    FOREIGN KEY (Branch_Key)
-        REFERENCES Dim_Branch (Branch_Key),
-    FOREIGN KEY (Date_Key)
-        REFERENCES Dim_Date (Date_Key),
-    FOREIGN KEY (Employee_Key)
-        REFERENCES Dim_Employee (Employee_Key),
-    FOREIGN KEY (Transaction_Type_Key)
-        REFERENCES Dim_Transaction_Type (Transaction_Type_Key),
-    FOREIGN KEY (Channel_Key)
-        REFERENCES Dim_Channel (Channel_Key)
+CREATE TABLE fact_transactions (
+    transaction_fact_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    customer_key INT NOT NULL,
+    account_key INT NOT NULL,
+    branch_key INT NOT NULL,
+    date_key INT NOT NULL,
+    employee_key INT,
+    transaction_type_key INT NOT NULL,
+    channel_key INT NOT NULL,
+
+    transaction_amount DECIMAL(18,2) NOT NULL,
+    transaction_fee DECIMAL(18,2) DEFAULT 0,
+    balance_after_transaction DECIMAL(18,2),
+    transaction_count INT DEFAULT 1,
+
+    FOREIGN KEY (customer_key) REFERENCES Dim_Customers(Customer_Key),
+    FOREIGN KEY (account_key) REFERENCES Dim_Accounts(Account_Key),
+    FOREIGN KEY (branch_key) REFERENCES Dim_Branches(Branch_Key),
+    FOREIGN KEY (date_key) REFERENCES Dim_Dates(Date_Key),
+    FOREIGN KEY (employee_key) REFERENCES Dim_Employees(Employee_Key),
+    FOREIGN KEY (transaction_type_key) REFERENCES Dim_Transaction_Types(Transaction_Type_Key),
+    FOREIGN KEY (channel_key) REFERENCES Dim_Channels(Channel_Key)
 );
 
-CREATE TABLE Fact_Loan (
-    Loan_Fact_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    Customer_Key INT NOT NULL,
-    Branch_Key INT NOT NULL,
-    Employee_Key INT,
-    Date_Key INT NOT NULL,
-    Loan_Product_Key INT NOT NULL,
-    Loan_Amount DECIMAL(18 , 2 ) NOT NULL,
-    Interest_Rate DECIMAL(5 , 2 ),
-    EMI_Amount DECIMAL(18 , 2 ),
-    Outstanding_Balance DECIMAL(18 , 2 ),
-    Loan_Count INT DEFAULT 1,
-    FOREIGN KEY (Customer_Key)
-        REFERENCES Dim_Customer (Customer_Key),
-    FOREIGN KEY (Branch_Key)
-        REFERENCES Dim_Branch (Branch_Key),
-    FOREIGN KEY (Employee_Key)
-        REFERENCES Dim_Employee (Employee_Key),
-    FOREIGN KEY (Date_Key)
-        REFERENCES Dim_Date (Date_Key),
-    FOREIGN KEY (Loan_Product_Key)
-        REFERENCES Dim_Loan_Product (Loan_Product_Key)
+CREATE TABLE Fact_Loans (
+    loan_fact_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    customer_key INT NOT NULL,
+    branch_key INT NOT NULL,
+    employee_key INT,
+    date_key INT NOT NULL,
+    loan_product_key INT NOT NULL,
+
+    loan_amount DECIMAL(18,2) NOT NULL,
+    interest_rate DECIMAL(5,2),
+    emi_amount DECIMAL(18,2),
+    outstanding_balance DECIMAL(18,2),
+    loan_count INT DEFAULT 1,
+
+    FOREIGN KEY (Customer_Key) REFERENCES dim_customers(customer_Key),
+    FOREIGN KEY (Branch_Key) REFERENCES Dim_Branches(Branch_Key),
+    FOREIGN KEY (Employee_Key) REFERENCES Dim_Employees(Employee_Key),
+    FOREIGN KEY (Date_Key) REFERENCES Dim_Dates(Date_Key),
+    FOREIGN KEY (Loan_Product_Key) REFERENCES Dim_Loan_Products(Loan_Product_Key)
 );
 
-CREATE TABLE Fact_Card_Transaction (
-    Card_Transaction_Fact_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    Customer_Key INT NOT NULL,
-    Card_Key INT NOT NULL,
-    Branch_Key INT NOT NULL,
-    Date_Key INT NOT NULL,
-    Channel_Key INT NOT NULL,
-    Transaction_Amount DECIMAL(18 , 2 ),
-    Cashback_Amount DECIMAL(18 , 2 ),
-    Reward_Points INT DEFAULT 0,
-    Transaction_Count INT DEFAULT 1,
-    FOREIGN KEY (Customer_Key)
-        REFERENCES Dim_Customer (Customer_Key),
-    FOREIGN KEY (Card_Key)
-        REFERENCES Dim_Card (Card_Key),
-    FOREIGN KEY (Branch_Key)
-        REFERENCES Dim_Branch (Branch_Key),
-    FOREIGN KEY (Date_Key)
-        REFERENCES Dim_Date (Date_Key),
-    FOREIGN KEY (Channel_Key)
-        REFERENCES Dim_Channel (Channel_Key)
+CREATE TABLE fact_card_transactions (
+    card_transaction_fact_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    customer_key INT NOT NULL,
+    card_key INT NOT NULL,
+    branch_key INT NOT NULL,
+    date_key INT NOT NULL,
+    channel_key INT NOT NULL,
+
+    transaction_amount DECIMAL(18,2),
+    cashback_amount DECIMAL(18,2),
+    reward_points INT DEFAULT 0,
+    transaction_count INT DEFAULT 1,
+
+    FOREIGN KEY (Customer_Key) REFERENCES Dim_Customers(Customer_Key),
+    FOREIGN KEY (Card_Key) REFERENCES Dim_Cards(Card_Key),
+    FOREIGN KEY (Branch_Key) REFERENCES Dim_Branches(Branch_Key),
+    FOREIGN KEY (Date_Key) REFERENCES Dim_Dates(Date_Key),
+    FOREIGN KEY (Channel_Key) REFERENCES Dim_Channels(Channel_Key)
 );
 
-CREATE TABLE Fact_Fixed_Deposit (
-    FD_Fact_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
-    Customer_Key INT NOT NULL,
-    Branch_Key INT NOT NULL,
-    Employee_Key INT,
-    Date_Key INT NOT NULL,
-    Deposit_Amount DECIMAL(18 , 2 ),
-    Interest_Rate DECIMAL(5 , 2 ),
-    Maturity_Amount DECIMAL(18 , 2 ),
-    Deposit_Term_Months INT,
-    FOREIGN KEY (Customer_Key)
-        REFERENCES Dim_Customer (Customer_Key),
-    FOREIGN KEY (Branch_Key)
-        REFERENCES Dim_Branch (Branch_Key),
-    FOREIGN KEY (Employee_Key)
-        REFERENCES Dim_Employee (Employee_Key),
-    FOREIGN KEY (Date_Key)
-        REFERENCES Dim_Date (Date_Key)
+CREATE TABLE fact_fixed_deposits (
+    fd_fact_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    customer_Key INT NOT NULL,
+    branch_Key INT NOT NULL,
+    employee_Key INT,
+    date_Key INT NOT NULL,
+
+    deposit_amount DECIMAL(18,2),
+    interest_rate DECIMAL(5,2),
+    maturity_amount DECIMAL(18,2),
+    deposit_term_months INT,
+
+    FOREIGN KEY (Customer_Key) REFERENCES Dim_Customers(Customer_Key),
+    FOREIGN KEY (Branch_Key) REFERENCES Dim_Branches(Branch_Key),
+    FOREIGN KEY (Employee_Key) REFERENCES Dim_Employees(Employee_Key),
+    FOREIGN KEY (Date_Key) REFERENCES Dim_Dates(Date_Key)
 );
-
-
-INSERT INTO Dim_Customer
+INSERT INTO Dim_Customers
 (Customer_ID, First_Name, Last_Name, Gender, Date_of_Birth, Mobile_Number, Email, City, State, Country, Customer_Type, KYC_Status)
 VALUES
-('CUST1001','Rahul','Sharma','M','1992-05-10','9876543210','rahul@gmail.com','Mumbai','Maharashtra','India','Retail','Verified'),
-('CUST1002','Priya','Patil','F','1995-07-18','9876543211','priya@gmail.com','Pune','Maharashtra','India','Retail','Verified'),
-('CUST1003','Amit','Verma','M','1988-11-20','9876543212','amit@gmail.com','Delhi','Delhi','India','Corporate','Verified'),
-('CUST1004','Sneha','Joshi','F','1991-02-15','9876543213','sneha@gmail.com','Nagpur','Maharashtra','India','Retail','Pending'),
-('CUST1005','Rohan','Mehta','M','1986-09-30','9876543214','rohan@gmail.com','Ahmedabad','Gujarat','India','HNI','Verified'),
-('CUST1006','Anjali','Singh','F','1994-12-11','9876543215','anjali@gmail.com','Lucknow','UP','India','Retail','Verified'),
-('CUST1007','Vikas','Kumar','M','1990-04-22','9876543216','vikas@gmail.com','Jaipur','Rajasthan','India','Corporate','Verified'),
-('CUST1008','Neha','Gupta','F','1993-06-17','9876543217','neha@gmail.com','Indore','MP','India','Retail','Verified'),
-('CUST1009','Karan','Malhotra','M','1987-08-08','9876543218','karan@gmail.com','Chandigarh','Punjab','India','HNI','Verified'),
-('CUST1010','Pooja','Kulkarni','F','1996-01-12','9876543219','pooja@gmail.com','Nashik','Maharashtra','India','Retail','Verified');
+('CUST1001','Rahul','Sharma','Male','1992-05-10','9876543210','rahul@gmail.com','Mumbai','Maharashtra','India','Retail','Verified'),
+('CUST1002','Priya','Patil','Female','1995-07-18','9876543211','priya@gmail.com','Pune','Maharashtra','India','Retail','Verified'),
+('CUST1003','Amit','Verma','Male','1988-11-20','9876543212','amit@gmail.com','Delhi','Delhi','India','Corporate','Verified'),
+('CUST1004','Sneha','Joshi','Female','1991-02-15','9876543213','sneha@gmail.com','Nagpur','Maharashtra','India','Retail','Pending'),
+('CUST1005','Rohan','Mehta','Male','1986-09-30','9876543214','rohan@gmail.com','Ahmedabad','Gujarat','India','HNI','Verified'),
+('CUST1006','Anjali','Singh','Female','1994-12-11','9876543215','anjali@gmail.com','Lucknow','UP','India','Retail','Verified'),
+('CUST1007','Vikas','Kumar','Male','1990-04-22','9876543216','vikas@gmail.com','Jaipur','Rajasthan','India','Corporate','Verified'),
+('CUST1008','Neha','Gupta','Female','1993-06-17','9876543217','neha@gmail.com','Indore','MP','India','Retail','Verified'),
+('CUST1009','Karan','Malhotra','Male','1987-08-08','9876543218','karan@gmail.com','Chandigarh','Punjab','India','HNI','Verified'),
+('CUST1010','Pooja','Kulkarni','Female','1996-01-12','9876543219','pooja@gmail.com','Nashik','Maharashtra','India','Retail','Verified');
 
-INSERT INTO Dim_Account
+INSERT INTO Dim_Accounts
 (Account_Number,Account_Type,Account_Status,Currency,Opening_Date,Minimum_Balance,Nominee_Available)
 VALUES
 ('ACC10001','Savings','Active','INR','2022-01-10',5000,TRUE),
@@ -222,7 +198,7 @@ VALUES
 ('ACC10009','Savings','Active','INR','2024-01-15',5000,TRUE),
 ('ACC10010','Current','Active','INR','2020-08-22',10000,FALSE);
 
-INSERT INTO Dim_Branch
+INSERT INTO Dim_Branches
 (Branch_Code,Branch_Name,City,State,Region,IFSC_Code)
 VALUES
 ('BR001','Mumbai Main','Mumbai','Maharashtra','West','FIN000001'),
@@ -236,7 +212,7 @@ VALUES
 ('BR009','Chandigarh Branch','Chandigarh','Punjab','North','FIN000009'),
 ('BR010','Nashik Branch','Nashik','Maharashtra','West','FIN000010');
 
-INSERT INTO Dim_Date
+INSERT INTO Dim_Dates
 (Date_Key,Full_Date,Day_Number,Month_Number,Month_Name,Quarter_Number,Year_Number,Week_Number,Is_Weekend)
 VALUES
 (20260101,'2026-01-01',1,1,'January',1,2026,1,'N'),
@@ -250,7 +226,7 @@ VALUES
 (20260109,'2026-01-09',9,1,'January',1,2026,2,'N'),
 (20260110,'2026-01-10',10,1,'January',1,2026,2,'Y');
 
-INSERT INTO Dim_Employee
+INSERT INTO Dim_Employees
 (Employee_ID,Employee_Name,Designation,Department,Branch_Name,Hire_Date)
 VALUES
 ('EMP001','Arun Desai','Manager','Operations','Mumbai Main','2018-01-10'),
@@ -264,7 +240,7 @@ VALUES
 ('EMP009','Mohit Sharma','Officer','Operations','Chandigarh Branch','2023-01-15'),
 ('EMP010','Sonal Kulkarni','Manager','Sales','Nashik Branch','2015-09-25');
 
-INSERT INTO Dim_Transaction_Type
+INSERT INTO Dim_Transaction_Types
 (Transaction_Code,Transaction_Name,Transaction_Category)
 VALUES
 ('TR001','Cash Deposit','Deposit'),
@@ -278,7 +254,7 @@ VALUES
 ('TR009','Interest Credit','Interest'),
 ('TR010','Service Charge','Fee');
 
-INSERT INTO Dim_Channel
+INSERT INTO Dim_Channels
 (Channel_Code,Channel_Name,Channel_Type)
 VALUES
 ('CH001','Branch','Offline'),
@@ -292,7 +268,7 @@ VALUES
 ('CH009','RTGS Portal','Online'),
 ('CH010','Self Service Kiosk','Offline');
 
-INSERT INTO Dim_Loan_Product
+INSERT INTO Dim_Loan_Products
 (Loan_Product_Code,Loan_Product_Name,Loan_Category,Maximum_Tenure)
 VALUES
 ('LN001','Home Loan','Housing',360),
@@ -307,7 +283,7 @@ VALUES
 ('LN010','Consumer Loan','Retail',48);
 
 
-INSERT INTO Dim_Card
+INSERT INTO Dim_Cards
 (Card_Number,Card_Type,Card_Network,Card_Category,Issue_Date,Expiry_Date,Card_Status)
 VALUES
 ('4111111111111001','Debit','Visa','Classic','2024-01-01','2029-01-01','Active'),
@@ -321,7 +297,7 @@ VALUES
 ('5555555555551009','Credit','MasterCard','Platinum','2023-09-01','2028-09-01','Active'),
 ('4111111111111010','Debit','Visa','Classic','2024-04-01','2029-04-01','Active');
 
-INSERT INTO Fact_Transaction
+INSERT INTO Fact_Transactions
 (Customer_Key,Account_Key,Branch_Key,Date_Key,Employee_Key,Transaction_Type_Key,Channel_Key,
 Transaction_Amount,Transaction_Fee,Balance_After_Transaction,Transaction_Count)
 VALUES
@@ -351,7 +327,7 @@ VALUES
 (9,9,9,20260109,9,600000.00,6.75,9200.00,580000.00,1),
 (10,10,10,20260110,10,150000.00,13.50,4200.00,142000.00,1);
 
-INSERT INTO Fact_Card_Transaction
+INSERT INTO Fact_Card_Transactions
 (Customer_Key, Card_Key, Branch_Key, Date_Key, Channel_Key,
 Transaction_Amount, Cashback_Amount, Reward_Points, Transaction_Count)
 VALUES
@@ -366,7 +342,7 @@ VALUES
 (9,9,9,20260109,3,11500.00,115.00,1150,1),
 (10,10,10,20260110,5,2800.00,28.00,280,1);
 
-INSERT INTO Fact_Fixed_Deposit
+INSERT INTO Fact_Fixed_Deposits
 (Customer_Key, Branch_Key, Employee_Key, Date_Key,
 Deposit_Amount, Interest_Rate, Maturity_Amount, Deposit_Term_Months)
 VALUES
@@ -380,3 +356,22 @@ VALUES
 (8,8,8,20260108,900000.00,7.10,1095000.00,36),
 (9,9,9,20260109,200000.00,6.30,212800.00,12),
 (10,10,10,20260110,600000.00,6.85,723000.00,24);
+
+
+
+**Queries of Sprint 5**
+use fincore_db;
+select count(*) as total_branches from dim_branches where state="Maharashtra" and region="west";
+select branch_name from dim_branches where branch_name like 'p%';
+select branch_name from dim_branches where branch_name like '%p%';
+select branch_name from dim_branches where branch_name like '%p';
+update dim_branches set  state="uttar pradesh" where branch_key=6;
+select * from dim_branches;
+select * from dim_cards;
+
+select * from dim_employees;
+select count(*) as tottal_count from dim_employees where hire_date between '2026-01-01' and '2027-01-01';
+
+select * from fact_loans;
+
+use acb;
