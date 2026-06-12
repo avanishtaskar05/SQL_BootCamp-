@@ -7,7 +7,7 @@ CREATE TABLE dim_customers (
     customer_id VARCHAR(20) NOT NULL UNIQUE,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
-    gender enum("Male","Female","Other") default "Male",
+    gender ENUM('Male', 'Female', 'Other') DEFAULT 'Male',
     date_of_birth DATE,
     mobile_number VARCHAR(15),
     email VARCHAR(30),
@@ -25,7 +25,7 @@ CREATE TABLE dim_accounts (
     account_status VARCHAR(20),
     currency VARCHAR(10),
     opening_date DATE,
-    minimum_balance DECIMAL(15,2),
+    minimum_balance DECIMAL(15 , 2 ),
     nominee_available BOOLEAN
 );
 
@@ -40,9 +40,9 @@ CREATE TABLE dim_branches (
 );
 
 CREATE TABLE dim_dates (
-    date_key INT PRIMARY KEY unique,
+    date_key INT PRIMARY KEY UNIQUE,
     full_date DATE,
-    account_opening_date date
+    account_opening_date DATE
 );
 
 CREATE TABLE dim_employees (
@@ -97,19 +97,24 @@ CREATE TABLE fact_transactions (
     employee_key INT,
     transaction_type_key INT NOT NULL,
     channel_key INT NOT NULL,
-
-    transaction_amount DECIMAL(18,2) NOT NULL,
-    transaction_fee DECIMAL(18,2) DEFAULT 0,
-    balance_after_transaction DECIMAL(18,2),
+    transaction_amount DECIMAL(18 , 2 ) NOT NULL,
+    transaction_fee DECIMAL(18 , 2 ) DEFAULT 0,
+    balance_after_transaction DECIMAL(18 , 2 ),
     transaction_count INT DEFAULT 1,
-
-    FOREIGN KEY (customer_key) REFERENCES Dim_Customers(Customer_Key),
-    FOREIGN KEY (account_key) REFERENCES Dim_Accounts(Account_Key),
-    FOREIGN KEY (branch_key) REFERENCES Dim_Branches(Branch_Key),
-    FOREIGN KEY (date_key) REFERENCES Dim_Dates(Date_Key),
-    FOREIGN KEY (employee_key) REFERENCES Dim_Employees(Employee_Key),
-    FOREIGN KEY (transaction_type_key) REFERENCES Dim_Transaction_Types(Transaction_Type_Key),
-    FOREIGN KEY (channel_key) REFERENCES Dim_Channels(Channel_Key)
+    FOREIGN KEY (customer_key)
+        REFERENCES Dim_Customers (Customer_Key),
+    FOREIGN KEY (account_key)
+        REFERENCES Dim_Accounts (Account_Key),
+    FOREIGN KEY (branch_key)
+        REFERENCES Dim_Branches (Branch_Key),
+    FOREIGN KEY (date_key)
+        REFERENCES Dim_Dates (Date_Key),
+    FOREIGN KEY (employee_key)
+        REFERENCES Dim_Employees (Employee_Key),
+    FOREIGN KEY (transaction_type_key)
+        REFERENCES Dim_Transaction_Types (Transaction_Type_Key),
+    FOREIGN KEY (channel_key)
+        REFERENCES Dim_Channels (Channel_Key)
 );
 
 CREATE TABLE Fact_Loans (
@@ -119,18 +124,21 @@ CREATE TABLE Fact_Loans (
     employee_key INT,
     date_key INT NOT NULL,
     loan_product_key INT NOT NULL,
-
-    loan_amount DECIMAL(18,2) NOT NULL,
-    interest_rate DECIMAL(5,2),
-    emi_amount DECIMAL(18,2),
-    outstanding_balance DECIMAL(18,2),
+    loan_amount DECIMAL(18 , 2 ) NOT NULL,
+    interest_rate DECIMAL(5 , 2 ),
+    emi_amount DECIMAL(18 , 2 ),
+    outstanding_balance DECIMAL(18 , 2 ),
     loan_count INT DEFAULT 1,
-
-    FOREIGN KEY (Customer_Key) REFERENCES dim_customers(customer_Key),
-    FOREIGN KEY (Branch_Key) REFERENCES Dim_Branches(Branch_Key),
-    FOREIGN KEY (Employee_Key) REFERENCES Dim_Employees(Employee_Key),
-    FOREIGN KEY (Date_Key) REFERENCES Dim_Dates(Date_Key),
-    FOREIGN KEY (Loan_Product_Key) REFERENCES Dim_Loan_Products(Loan_Product_Key)
+    FOREIGN KEY (Customer_Key)
+        REFERENCES dim_customers (customer_Key),
+    FOREIGN KEY (Branch_Key)
+        REFERENCES Dim_Branches (Branch_Key),
+    FOREIGN KEY (Employee_Key)
+        REFERENCES Dim_Employees (Employee_Key),
+    FOREIGN KEY (Date_Key)
+        REFERENCES Dim_Dates (Date_Key),
+    FOREIGN KEY (Loan_Product_Key)
+        REFERENCES Dim_Loan_Products (Loan_Product_Key)
 );
 
 CREATE TABLE fact_card_transactions (
@@ -140,17 +148,20 @@ CREATE TABLE fact_card_transactions (
     branch_key INT NOT NULL,
     date_key INT NOT NULL,
     channel_key INT NOT NULL,
-
-    transaction_amount DECIMAL(18,2),
-    cashback_amount DECIMAL(18,2),
+    transaction_amount DECIMAL(18 , 2 ),
+    cashback_amount DECIMAL(18 , 2 ),
     reward_points INT DEFAULT 0,
     transaction_count INT DEFAULT 1,
-
-    FOREIGN KEY (Customer_Key) REFERENCES Dim_Customers(Customer_Key),
-    FOREIGN KEY (Card_Key) REFERENCES Dim_Cards(Card_Key),
-    FOREIGN KEY (Branch_Key) REFERENCES Dim_Branches(Branch_Key),
-    FOREIGN KEY (Date_Key) REFERENCES Dim_Dates(Date_Key),
-    FOREIGN KEY (Channel_Key) REFERENCES Dim_Channels(Channel_Key)
+    FOREIGN KEY (Customer_Key)
+        REFERENCES Dim_Customers (Customer_Key),
+    FOREIGN KEY (Card_Key)
+        REFERENCES Dim_Cards (Card_Key),
+    FOREIGN KEY (Branch_Key)
+        REFERENCES Dim_Branches (Branch_Key),
+    FOREIGN KEY (Date_Key)
+        REFERENCES Dim_Dates (Date_Key),
+    FOREIGN KEY (Channel_Key)
+        REFERENCES Dim_Channels (Channel_Key)
 );
 
 CREATE TABLE fact_fixed_deposits (
@@ -159,16 +170,18 @@ CREATE TABLE fact_fixed_deposits (
     branch_Key INT NOT NULL,
     employee_Key INT,
     date_Key INT NOT NULL,
-
-    deposit_amount DECIMAL(18,2),
-    interest_rate DECIMAL(5,2),
-    maturity_amount DECIMAL(18,2),
+    deposit_amount DECIMAL(18 , 2 ),
+    interest_rate DECIMAL(5 , 2 ),
+    maturity_amount DECIMAL(18 , 2 ),
     deposit_term_months INT,
-
-    FOREIGN KEY (Customer_Key) REFERENCES Dim_Customers(Customer_Key),
-    FOREIGN KEY (Branch_Key) REFERENCES Dim_Branches(Branch_Key),
-    FOREIGN KEY (Employee_Key) REFERENCES Dim_Employees(Employee_Key),
-    FOREIGN KEY (Date_Key) REFERENCES Dim_Dates(Date_Key)
+    FOREIGN KEY (Customer_Key)
+        REFERENCES Dim_Customers (Customer_Key),
+    FOREIGN KEY (Branch_Key)
+        REFERENCES Dim_Branches (Branch_Key),
+    FOREIGN KEY (Employee_Key)
+        REFERENCES Dim_Employees (Employee_Key),
+    FOREIGN KEY (Date_Key)
+        REFERENCES Dim_Dates (Date_Key)
 );
 INSERT INTO Dim_Customers
 (Customer_ID, First_Name, Last_Name, Gender, Date_of_Birth, Mobile_Number, Email, City, State, Country, Customer_Type, KYC_Status)
@@ -359,19 +372,49 @@ VALUES
 
 
 
-**Queries of Sprint 5**
+
 use fincore_db;
-select count(*) as total_branches from dim_branches where state="Maharashtra" and region="west";
-select branch_name from dim_branches where branch_name like 'p%';
-select branch_name from dim_branches where branch_name like '%p%';
-select branch_name from dim_branches where branch_name like '%p';
-update dim_branches set  state="uttar pradesh" where branch_key=6;
-select * from dim_branches;
-select * from dim_cards;
+SELECT 
+    COUNT(*) AS total_branches
+FROM
+    dim_branches
+WHERE
+    state = 'Maharashtra'
+        AND region = 'west';
+SELECT 
+    branch_name
+FROM
+    dim_branches
+WHERE
+    branch_name LIKE 'p%';
+UPDATE dim_branches 
+SET 
+    state = 'uttar pradesh'
+WHERE
+    branch_key = 6;
+SELECT 
+    *
+FROM
+    dim_branches;
+SELECT 
+    *
+FROM
+    dim_cards;
 
-select * from dim_employees;
-select count(*) as tottal_count from dim_employees where hire_date between '2026-01-01' and '2027-01-01';
+SELECT 
+    *
+FROM
+    dim_employees;
+SELECT 
+    COUNT(*) AS tottal_count
+FROM
+    dim_employees
+WHERE
+    hire_date BETWEEN '2026-01-01' AND '2027-01-01';
 
-select * from fact_loans;
+SELECT 
+    *
+FROM
+    fact_loans;
 
 use acb;
