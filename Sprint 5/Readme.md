@@ -138,12 +138,10 @@ CREATE TABLE fact_card_transactions (
     branch_key INT NOT NULL,
     date_key INT NOT NULL,
     channel_key INT NOT NULL,
-
     transaction_amount DECIMAL(18,2),
     cashback_amount DECIMAL(18,2),
     reward_points INT DEFAULT 0,
     transaction_count INT DEFAULT 1,
-
     FOREIGN KEY (Customer_Key) REFERENCES Dim_Customers(Customer_Key),
     FOREIGN KEY (Card_Key) REFERENCES Dim_Cards(Card_Key),
     FOREIGN KEY (Branch_Key) REFERENCES Dim_Branches(Branch_Key),
@@ -157,12 +155,10 @@ CREATE TABLE fact_fixed_deposits (
     branch_Key INT NOT NULL,
     employee_Key INT,
     date_Key INT NOT NULL,
-
     deposit_amount DECIMAL(18,2),
     interest_rate DECIMAL(5,2),
     maturity_amount DECIMAL(18,2),
     deposit_term_months INT,
-
     FOREIGN KEY (Customer_Key) REFERENCES Dim_Customers(Customer_Key),
     FOREIGN KEY (Branch_Key) REFERENCES Dim_Branches(Branch_Key),
     FOREIGN KEY (Employee_Key) REFERENCES Dim_Employees(Employee_Key),
@@ -354,10 +350,11 @@ VALUES
 (8,8,8,20260108,900000.00,7.10,1095000.00,36),
 (9,9,9,20260109,200000.00,6.30,212800.00,12),
 (10,10,10,20260110,600000.00,6.85,723000.00,24);
-
+_______________________________________________________________________________________
 
 
 **Queries for Sprint 5**
+_______________________________________________________________________________________
 use fincore_db;
 select count(*) as total_branches from dim_branches where state="Maharashtra" and region="west";
 select branch_name from dim_branches where branch_name like 'p%';
